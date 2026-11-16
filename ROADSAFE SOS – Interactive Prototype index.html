@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ROADSAFE SOS – Offline Vehicle Emergency Alert System</title>
+<style>
+:root{--bg:#eef1f7;--ink:#0b1f44;--mut:#5b6785;--card:#fff;--line:#dde3f0;--navy:#0b1f44;--red:#e5192d;--ok:#16a34a;--warn:#d97706;--phone:#0b1f44;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#070d1c;--ink:#eaf0ff;--mut:#9aa7c7;--card:#13213f;--line:#243558;--phone:#000}}
+:root[data-theme="dark"]{--bg:#070d1c;--ink:#eaf0ff;--mut:#9aa7c7;--card:#13213f;--line:#243558;--phone:#000}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{padding:20px 16px 4px;text-align:center}
+header h1{margin:0;font-size:22px;letter-spacing:.5px}header h1 b{color:var(--red)}
+header p{margin:4px 0 0;color:var(--mut);font-size:13px}
+.panel{max-width:760px;margin:12px auto;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px}
+.panel b{margin-right:4px}
+.panel button,.panel select{font:inherit;padding:8px 12px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.panel button.p{background:var(--red);color:#fff;border-color:var(--red);font-weight:700}
+.stage{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;padding:10px 10px 40px}
+.wrap{text-align:center}.wrap h2{font-size:13px;color:var(--mut);margin:0 0 8px;letter-spacing:1px;text-transform:uppercase}
+.phone{width:320px;height:640px;background:var(--phone);border-radius:42px;padding:10px;box-shadow:0 18px 40px rgba(11,31,68,.35);position:relative;margin:auto}
+.phone:before{content:"";position:absolute;top:16px;left:50%;transform:translateX(-50%);width:90px;height:20px;background:#000;border-radius:12px;z-index:5}
+.scr{width:100%;height:100%;border-radius:32px;overflow:hidden;background:#f6f8fc;color:#0b1f44;position:relative;text-align:left}
+.sb{height:34px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 22px 4px;font-size:11px;font-weight:600}
+.view{position:absolute;inset:34px 0 0 0;display:none;flex-direction:column;padding:12px 16px 16px;overflow-y:auto}
+.view.on{display:flex}
+.navy{background:var(--navy);color:#fff}
+.logo{width:88px;height:88px;border-radius:26px;background:var(--red);display:grid;place-items:center;color:#fff;font-weight:900;font-size:26px;margin:0 auto 14px;box-shadow:0 0 0 8px rgba(229,25,45,.25)}
+.btn{border:0;border-radius:14px;padding:14px;font:inherit;font-weight:700;font-size:15px;cursor:pointer;width:100%;margin-top:8px}
+.red{background:var(--red);color:#fff}.wh{background:#fff;color:var(--navy)}.out{background:transparent;border:2px solid #fff;color:#fff}.nv{background:var(--navy);color:#fff}.gr{background:var(--ok);color:#fff}
+.card{background:#fff;border:1px solid #dde3f0;border-radius:14px;padding:10px 12px;margin-top:10px;font-size:13px}
+.h{font-weight:800;font-size:17px;margin:0}
+.row{display:flex;justify-content:space-between;align-items:center;padding:5px 0;font-size:13px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:var(--ok)}.dot.off{background:#94a3b8}.dot.bad{background:var(--red)}.dot.w{background:var(--warn)}
+.tag{font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;background:#e8f7ee;color:#15803d}.tag.off{background:#eef1f7;color:#64748b}.tag.bad{background:#fde8ea;color:var(--red)}
+.sos{width:170px;height:170px;border-radius:50%;border:0;margin:14px auto 8px;background:radial-gradient(circle at 35% 30%,#ff5a6a,var(--red) 60%,#a80f1f);color:#fff;font-weight:900;font-size:36px;cursor:pointer;box-shadow:0 0 0 10px rgba(229,25,45,.15),0 0 0 22px rgba(229,25,45,.08),0 10px 24px rgba(229,25,45,.5);animation:pulse 2s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 14px rgba(229,25,45,.2),0 0 0 30px rgba(229,25,45,.06),0 10px 24px rgba(229,25,45,.5)}}
+.steps{list-style:none;padding:0;margin:8px 0}
+.steps li{display:flex;gap:8px;align-items:center;padding:6px 0;font-size:13px;color:#8b95ad}
+.steps li i{width:20px;height:20px;border-radius:50%;border:2px solid #cbd3e4;display:grid;place-items:center;font-style:normal;font-size:11px;flex:none}
+.steps li.run{color:var(--navy);font-weight:700}.steps li.run i{border-color:var(--red);animation:blink .6s infinite alternate}
+.steps li.done{color:var(--ok)}.steps li.done i{background:var(--ok);border-color:var(--ok);color:#fff}
+@keyframes blink{to{background:#fde8ea}}
+.alarm{text-align:center;color:var(--red);font-weight:900;font-size:19px;animation:fl 1s infinite}@keyframes fl{50%{opacity:.45}}
+.map{border-radius:14px;overflow:hidden;border:1px solid #dde3f0;margin-top:10px;background:#e7efe3}
+.map svg{display:block;width:100%}
+.ring{animation:rg 1.6s infinite;transform-origin:center;transform-box:fill-box}@keyframes rg{from{transform:scale(.4);opacity:.8}to{transform:scale(2.2);opacity:0}}
+.lock{background:linear-gradient(160deg,#0b1f44,#1b3a7a);color:#fff;text-align:center}
+.lock .t{font-size:54px;font-weight:300;margin-top:30px}
+.notif{background:rgba(255,255,255,.96);color:#0b1f44;border-radius:16px;padding:12px;text-align:left;margin-top:16px;cursor:pointer;border-left:6px solid var(--red);animation:pop .4s}
+@keyframes pop{from{transform:translateY(-20px) scale(.95);opacity:0}}
+.sirenbar{background:var(--red);color:#fff;padding:12px;border-radius:14px;text-align:center;font-weight:900;letter-spacing:.5px;animation:fl 1s infinite}
+.toast{position:absolute;left:14px;right:14px;bottom:16px;background:var(--navy);color:#fff;padding:10px 12px;border-radius:12px;font-size:12px;display:none;z-index:9}
+.hist div{display:flex;justify-content:space-between;font-size:12px;padding:6px 0;border-bottom:1px solid #eef1f7}
+.nav{display:flex;gap:6px;margin-top:auto;padding-top:10px}.nav button{flex:1;padding:8px 0;font-size:11px;border:0;border-radius:10px;background:#e8edf7;color:var(--navy);font-weight:700;cursor:pointer}
+code{font-size:11px;background:#eef1f7;padding:1px 5px;border-radius:5px}
+.arch{max-width:760px;margin:0 auto 30px;padding:0 14px;font-size:13px;color:var(--mut);text-align:center}
+</style></head><body>
+<header><h1>ROAD<b>SAFE</b> SOS</h1><p>Offline Vehicle Emergency Alert System – interactive prototype</p></header>
+
+<div class="panel">
+ <b>DEMO MODE</b>
+ <select id="type"><option>Vehicle Accident</option><option>Vehicle Breakdown</option></select>
+ <button class="p" onclick="trigger()">🔘 Press physical SOS button</button>
+ <button onclick="resetAll()">↺ Reset demo</button>
+ <button onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark'">◐ Theme</button>
+ <span style="color:var(--mut);flex-basis:100%">Left: the traveller's app. Right: the registered contact's phone. The SMS is simulated; real hardware would use GPS + GSM + a push button on a microcontroller.</span>
+</div>
+
+<div class="stage">
+ <div class="wrap"><h2>Traveller's phone</h2>
+ <div class="phone"><div class="scr" id="A">
+  <div class="sb"><span>9:41</span><span id="sbA">📶 No data</span></div>
+
+  <div class="view navy on" id="a1" style="justify-content:center;text-align:center">
+   <div class="logo">SOS</div>
+   <div class="h" style="font-size:26px">ROADSAFE SOS</div>
+   <p style="opacity:.85;font-style:italic;margin:8px 0 22px">“Your Safety, Even Where Roads End.”</p>
+   <button class="btn red" onclick="go('a2')">Login</button>
+   <button class="btn out" onclick="go('a2')">Continue as Demo User</button>
+   <p style="font-size:11px;opacity:.6;margin-top:16px">Works without mobile internet</p>
+  </div>
+
+  <div class="view" id="a2">
+   <p class="h">ROADSAFE SOS</p><span style="font-size:12px;color:#5b6785">Hello, Demo User · PB 10 AB 1234</span>
+   <div class="card">
+    <div class="row"><span><span class="dot"></span>SOS device (Bluetooth/wired)</span><span class="tag">Connected</span></div>
+    <div class="row"><span><span class="dot"></span>GPS satellites</span><span class="tag">Fix · 9 sats</span></div>
+    <div class="row"><span><span class="dot"></span>Cellular (GSM/SMS)</span><span class="tag">Signal ▂▄▆</span></div>
+    <div class="row"><span><span class="dot off"></span>Internet</span><span class="tag off">Not needed</span></div>
+   </div>
+   <div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><b>Emergency contact</b><br>Rohan Sharma (Brother)<br><span style="color:#5b6785">+91 98765 43210</span></div><span style="font-size:26px">👤</span></div>
+   <button class="sos" onclick="trigger()">SOS</button>
+   <div style="text-align:center;font-size:12px;color:#5b6785">Press the app button or the in-car device button</div>
+   <div class="card"><b>How it works</b><br>1. Button press wakes the microcontroller.<br>2. GPS module reads coordinates (no internet).<br>3. GSM module texts them to your contact.</div>
+  </div>
+
+  <div class="view" id="a3">
+   <div class="sirenbar">🚨 Emergency SOS Activated!</div>
+   <p style="text-align:center;margin:10px 0 0;font-weight:700" id="stat">Fetching GPS Location...</p>
+   <div class="card"><b>Type:</b> <span id="etype">Vehicle Accident / Breakdown</span></div>
+   <ul class="steps" id="steps">
+    <li><i>1</i>SOS button signal received</li><li><i>2</i>Fetching GPS Location...</li>
+    <li><i>3</i>Composing SMS via GSM module</li><li><i>4</i>SMS sent to Rohan Sharma</li><li><i>5</i>Delivered ✓</li></ul>
+   <div class="map" id="mapA3"></div>
+   <div id="coord3" style="font-size:12px;text-align:center;margin-top:6px;color:#5b6785">Waiting for GPS fix…</div>
+   <button class="btn nv" id="toTrack" style="display:none" onclick="go('a5')">View live tracking</button>
+  </div>
+
+  <div class="view" id="a5">
+   <p class="h">Location Tracking</p>
+   <div class="map" id="mapA5"></div>
+   <div class="card">
+    <div class="row"><span>Latitude</span><b id="lat">–</b></div><div class="row"><span>Longitude</span><b id="lng">–</b></div>
+    <div class="row"><span>Last updated</span><b id="upd">–</b></div>
+    <div class="row"><span>Location sharing</span><span class="tag bad">● Active via SMS</span></div>
+   </div>
+   <button class="btn gr" onclick="resolve()">✔ Mark emergency as resolved</button>
+  </div>
+
+  <div class="view" id="a6">
+   <div style="text-align:center;margin-top:6px"><div style="font-size:54px">✅</div><p class="h">Emergency Resolved</p><span style="font-size:12px;color:#5b6785">Rohan Sharma was notified that you are safe.</span></div>
+   <div class="card"><b>Emergency history</b><div class="hist" id="hist"></div></div>
+   <button class="btn nv" onclick="go('a2')">Back to dashboard</button>
+  </div>
+ </div></div></div>
+
+ <div class="wrap"><h2>Emergency contact's phone</h2>
+ <div class="phone"><div class="scr" id="B">
+  <div class="sb" id="sbB" style="color:#fff;position:absolute;inset:0 0 auto 0;z-index:3"><span>9:41</span><span>📶 SMS</span></div>
+
+  <div class="view lock on" id="b1" style="padding-top:20px">
+   <div class="t" id="clock">9:41</div><div style="opacity:.8">Monday, 16 November</div>
+   <div id="bwait" style="margin-top:60px;opacity:.6;font-size:13px">No new notifications</div>
+   <div id="bnotif"></div>
+  </div>
+
+  <div class="view" id="b2" style="padding-top:12px">
+   <div class="sirenbar">🚨 EMERGENCY SOS ALERT</div>
+   <p style="margin:10px 0 0;font-size:13px">An emergency has been triggered from a registered vehicle.</p>
+   <div class="card">
+    <div class="row"><span>Emergency Status</span><span class="tag bad" id="bstat">ACTIVE</span></div>
+    <div class="row"><span>Type</span><b id="btype">Accident</b></div>
+    <div class="row"><span>Vehicle</span><b>PB 10 AB 1234</b></div>
+    <div class="row"><span>Time</span><b id="btime">–</b></div>
+    <div class="row"><span>GPS</span><b id="bgps" style="font-size:11px">–</b></div>
+    <div style="font-size:11px;word-break:break-all;margin-top:4px;color:#1d4ed8" id="blink">–</div>
+   </div>
+   <button class="btn red" onclick="go('b3')">📍 VIEW LOCATION</button>
+   <button class="btn nv" onclick="call()">📞 CALL EMERGENCY CONTACT</button>
+   <div class="toast" id="toast"></div>
+  </div>
+
+  <div class="view" id="b3">
+   <p class="h">Vehicle Location</p>
+   <div class="map" id="mapB"></div>
+   <div class="card"><div class="row"><span>Status</span><span class="tag bad" id="bstat2">ACTIVE</span></div><div class="row"><span>Position</span><b id="bgps2" style="font-size:11px">–</b></div></div>
+   <button class="btn nv" onclick="call()">📞 Call traveller</button>
+   <button class="btn wh" style="border:1px solid #dde3f0" onclick="go('b2')">← Back to alert</button>
+   <div class="toast" id="toast2"></div>
+  </div>
+ </div></div></div>
+</div>
+
+<div class="arch"><b>Why it works offline:</b> GPS receives satellite signals directly, and the GSM module sends plain SMS over the cellular control channel — neither needs mobile data or Wi-Fi. The Maps link in the SMS is only opened later, on the receiver's phone, if they have internet.</div>
+
+<script>
+const $=id=>document.getElementById(id);
+let S={active:false,lat:30.9010,lng:75.8573,timers:[],hist:[
+ {d:"02 Nov 2026",t:"Breakdown – resolved"},{d:"14 Sep 2026",t:"Test alert – resolved"}]};
+const fmt=n=>n.toFixed(5);
+function mapSVG(){return `<svg viewBox="0 0 300 170"><rect width="300" height="170" fill="#e7efe3"/>
+<rect x="0" y="120" width="300" height="50" fill="#d6e6c8"/><rect x="190" y="10" width="90" height="50" fill="#cfe1ee"/>
+<path d="M-10 140 C80 130 120 70 180 85 S280 40 320 30" stroke="#fff" stroke-width="14" fill="none"/>
+<path d="M-10 140 C80 130 120 70 180 85 S280 40 320 30" stroke="#f3c969" stroke-width="2" stroke-dasharray="8 6" fill="none"/>
+<path d="M120 170 L150 78" stroke="#fff" stroke-width="6" fill="none"/>
+<text x="20" y="160" font-size="9" fill="#5b6785">Isolated highway stretch</text>
+<g transform="translate(150,82)"><circle class="ring" r="12" fill="#e5192d"/><circle r="7" fill="#e5192d" stroke="#fff" stroke-width="3"/></g></svg>`}
+function go(id){const p=id[0].toUpperCase();document.querySelectorAll('#'+p+' .view').forEach(v=>v.classList.remove('on'));$(id).classList.add('on');
+ if(id==='a5'||id==='a3'||id==='b3'){['mapA3','mapA5','mapB'].forEach(m=>$(m).innerHTML=mapSVG())}}
+function later(f,ms){S.timers.push(setTimeout(f,ms))}
+function setStep(i,st){const li=$('steps').children[i];li.className=st;if(st==='done')li.querySelector('i').textContent='✓'}
+function now(){return new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}
+function trigger(){
+ if(S.active)return;S.active=true;
+ const ty=$('type').value;$('etype').textContent=ty+' / Breakdown';
+ go('a3');$('toTrack').style.display='none';$('stat').textContent='Fetching GPS Location...';$('coord3').textContent='Waiting for GPS fix…';
+ [...$('steps').children].forEach((li,i)=>{li.className='';li.querySelector('i').textContent=i+1});
+ S.lat=30.9010+(Math.random()-.5)*.01;S.lng=75.8573+(Math.random()-.5)*.01;
+ setStep(0,'run');
+ later(()=>{setStep(0,'done');setStep(1,'run')},900);
+ later(()=>{setStep(1,'done');$('coord3').innerHTML='📍 <b>'+fmt(S.lat)+'° N, '+fmt(S.lng)+'° E</b> (simulated GPS fix)';$('stat').textContent='GPS fixed – sending SMS…';setStep(2,'run');$('sbA').textContent='📶 SMS sending';},2400);
+ later(()=>{setStep(2,'done');setStep(3,'run')},3600);
+ later(()=>{setStep(3,'done');setStep(4,'run');receive(ty)},5000);
+ later(()=>{setStep(4,'done');$('stat').textContent='✅ Alert delivered – help is being contacted';$('toTrack').style.display='block';$('sbA').textContent='📶 No data';startTrack()},6000);
+}
+function receive(ty){
+ const t=now(),g=fmt(S.lat)+', '+fmt(S.lng),link='https://maps.google.com/?q='+S.lat.toFixed(5)+','+S.lng.toFixed(5);
+ $('btime').textContent=t;$('bgps').textContent=g;$('blink').textContent=link;$('btype').textContent=ty;
+ $('bgps2').textContent=g;$('bstat').textContent=$('bstat2').textContent='ACTIVE';
+ $('bwait').style.display='none';
+ $('bnotif').innerHTML=`<div class="notif" onclick="go('b2')"><div style="font-size:11px;color:#5b6785">SMS · now</div><b style="color:#e5192d">🚨 EMERGENCY SOS ALERT</b><div style="font-size:12px;margin-top:4px">ROADSAFE: PB 10 AB 1234 needs help. ${ty}. Loc ${g}. Tap to open.</div></div>`;
+ go('b1');
+}
+let trk;
+function startTrack(){clearInterval(trk);const upd=()=>{S.lat+=(Math.random()-.5)*.0001;S.lng+=(Math.random()-.5)*.0001;
+ $('lat').textContent=fmt(S.lat)+'° N';$('lng').textContent=fmt(S.lng)+'° E';$('upd').textContent=now()};upd();trk=setInterval(upd,2000)}
+function resolve(){
+ clearInterval(trk);S.hist.unshift({d:'16 Nov 2026',t:$('type').value+' – resolved'});
+ $('hist').innerHTML=S.hist.map(h=>`<div><span>${h.d}</span><b>${h.t}</b></div>`).join('');
+ go('a6');S.active=false;
+ $('bstat').textContent=$('bstat2').textContent='RESOLVED';$('bstat').className=$('bstat2').className='tag';
+ $('bnotif').innerHTML=`<div class="notif" style="border-color:#16a34a" onclick="go('b2')"><div style="font-size:11px;color:#5b6785">SMS · now</div><b style="color:#16a34a">✅ SOS RESOLVED</b><div style="font-size:12px;margin-top:4px">PB 10 AB 1234: the traveller marked the emergency as resolved.</div></div>`;go('b1');
+}
+function call(){['toast','toast2'].forEach(i=>{const t=$(i);t.style.display='block';t.textContent='📞 Calling Demo User… (simulated)';setTimeout(()=>t.style.display='none',2200)})}
+function resetAll(){S.timers.forEach(clearTimeout);clearInterval(trk);S.active=false;go('a1');go('b1');$('bnotif').innerHTML='';$('bwait').style.display='block';$('sbA').textContent='📶 No data';$('bstat').className='tag bad';$('bstat2').className='tag bad'}
+$('hist').innerHTML=S.hist.map(h=>`<div><span>${h.d}</span><b>${h.t}</b></div>`).join('');
+</script></body></html>
